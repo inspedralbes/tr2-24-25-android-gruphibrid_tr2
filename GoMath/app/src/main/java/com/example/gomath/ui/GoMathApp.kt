@@ -7,7 +7,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.example.gomath.MainActivity
 import com.example.gomath.R
 import com.example.gomath.ui.screens.LoginScreen
 
@@ -24,7 +23,7 @@ fun GoMathApp(navController: NavHostController, context: Context) {
 
     NavHost(navController, startDestination = GoMathApp.Login.name) {
         composable(route = GoMathApp.Login.name) {
-            LoginScreen()
+            LoginScreen(viewModel)
         }
 //        composable(route = GoMathApp.Code.name) {
 //            CodeScreen()

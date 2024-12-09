@@ -19,13 +19,12 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.gomath.ui.GoMathViewModel
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
-fun LoginScreen() {
+fun LoginScreen(viewModel: GoMathViewModel) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
@@ -130,7 +129,8 @@ fun LoginScreen() {
                             if (email.isNotEmpty() && password.isNotEmpty()) {
                                 showError = false
                                 loginSuccess = true
-                                handleLogin(context, email, password)
+                                viewModel.login(email, password)
+                                handleLogin(context)
                             } else {
                                 showError = true
                             }
@@ -182,15 +182,6 @@ fun LoginScreen() {
 }
 
 // Función para manejar el inicio de sesión
-fun handleLogin(context: Context, email: String, password: String) {
+fun handleLogin(context: Context) {
     Toast.makeText(context, "Iniciant sessió...", Toast.LENGTH_SHORT).show()
-}
-
-// Vista previa
-@Preview(showBackground = true)
-@Composable
-fun LoginScreenPreview() {
-    MaterialTheme {
-        LoginScreen()
-    }
 }

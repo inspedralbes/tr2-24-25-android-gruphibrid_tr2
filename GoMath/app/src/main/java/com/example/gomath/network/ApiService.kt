@@ -21,12 +21,12 @@ object RetrofitInstance {
             .build()
     }
 
-    val api: TakeAwayApi by lazy {
-        retrofit.create(TakeAwayApi::class.java)
+    val api: GoMathApi by lazy {
+        retrofit.create(GoMathApi::class.java)
     }
 }
 
-interface TakeAwayApi {
+interface GoMathApi {
     @POST("api/userLogin") // Canviar direcció
     suspend fun login(@Body loginRequest: LoginRequest): Response<Usuari>
 }

@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">GoMath</string>
+    <string name="login">login</string>
+    <string name="code">code</string>
+    <string name="control">control</string>
+    <string name="result">result</string>
 </resources>

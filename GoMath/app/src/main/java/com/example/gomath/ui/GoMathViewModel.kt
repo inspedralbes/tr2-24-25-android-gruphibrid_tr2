@@ -6,8 +6,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gomath.data.loginFromApi
 import com.example.gomath.model.LoginRequest
-import com.example.gomath.model.Usuari
+import com.example.gomath.model.User
 import kotlinx.coroutines.launch
+import io.socket.client.IO
+import io.socket.client.Socket
+import io.socket.emitter.Emitter
 
 class GoMathViewModel() : ViewModel() {
     private val loginError = mutableStateOf<String?>(null)
@@ -23,7 +26,7 @@ class GoMathViewModel() : ViewModel() {
                 Log.d("response", result.toString())
                 val loginResponse = result.getOrNull()
                 if (loginResponse != null) {
-                    val user = Usuari(
+                    val user = User(
                         loginResponse.email,
                         loginResponse.role
                     )

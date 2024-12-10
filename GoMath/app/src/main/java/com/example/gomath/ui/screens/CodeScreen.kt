@@ -1,22 +1,49 @@
 package com.example.gomath.ui.screens
 
-import android.content.Context
-import android.widget.Toast
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
@@ -25,13 +52,10 @@ import androidx.navigation.NavHostController
 import com.example.gomath.ui.GoMathViewModel
 
 @Composable
-fun LoginScreen(viewModel: GoMathViewModel, navController: NavHostController) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
+fun CodeScreen(viewModel: GoMathViewModel, navController: NavHostController) {
+    var code by remember { mutableStateOf("") }
     var showError by remember { mutableStateOf(false) }
-    var loginSuccess by remember { mutableStateOf(false) }
-    val context = LocalContext.current
+    var codeSuccess by remember { mutableStateOf(false) }
 
     // Fondo animado
     val infiniteTransition = rememberInfiniteTransition()
@@ -59,7 +83,7 @@ fun LoginScreen(viewModel: GoMathViewModel, navController: NavHostController) {
         contentAlignment = Alignment.Center
     ) {
         AnimatedVisibility(
-            visible = !loginSuccess,
+            visible = !codeSuccess,
             enter = fadeIn(animationSpec = tween(1000)) + expandVertically(),
             exit = fadeOut(animationSpec = tween(800)) + shrinkVertically()
         ) {
@@ -84,58 +108,28 @@ fun LoginScreen(viewModel: GoMathViewModel, navController: NavHostController) {
 
                     // Campo de correo electrónico
                     OutlinedTextField(
-                        value = email,
-                        onValueChange = { email = it },
-                        label = { Text("Correu electrònic") },
-                        placeholder = { Text("exemple@correu.com") },
+                        value = code,
+                        onValueChange = { code = it },
+                        label = { Text("Introdueixi un Codi") },
+                        placeholder = { Text("Codi") },
                         leadingIcon = {
                             Icon(Icons.Default.Email, contentDescription = "Email")
                         },
                         singleLine = true,
-                        isError = showError && email.isEmpty(),
+                        isError = showError && code.isEmpty(),
                         modifier = Modifier.fillMaxWidth()
                     )
 
                     Spacer(modifier = Modifier.height(16.dp))
-
-                    // Campo de contraseña
-                    OutlinedTextField(
-                        value = password,
-                        onValueChange = { password = it },
-                        label = { Text("Contrasenya") },
-                        placeholder = { Text("******") },
-                        leadingIcon = {
-                            Icon(Icons.Default.Lock, contentDescription = "Contrasenya")
-                        },
-                        visualTransformation = if (passwordVisible)
-                            VisualTransformation.None else PasswordVisualTransformation(),
-                        trailingIcon = {
-                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                                Icon(
-                                    imageVector = Icons.Default.Lock,
-                                    contentDescription = "Mostra o amaga la contrasenya"
-                                )
-                            }
-                        },
-                        singleLine = true,
-                        isError = showError && password.isEmpty(),
-                        modifier = Modifier.fillMaxWidth()
-                    )
 
                     Spacer(modifier = Modifier.height(24.dp))
 
                     // Botón de inicio de sesión
                     Button(
                         onClick = {
-                            if (email.isNotEmpty() && password.isNotEmpty()) {
-                                showError = false
-                                loginSuccess = true
-                                viewModel.login(email, password)
-                                handleLogin(context)
-                                navController.navigate("")
-                            } else {
-                                showError = true
-                            }
+                            // Enviar codigo
+                            showError = false
+                            codeSuccess = true
                         },
                         modifier = Modifier
                             .fillMaxWidth()
@@ -169,7 +163,7 @@ fun LoginScreen(viewModel: GoMathViewModel, navController: NavHostController) {
 
         // Animación de éxito
         AnimatedVisibility(
-            visible = loginSuccess,
+            visible = codeSuccess,
             enter = scaleIn(animationSpec = tween(1000)) + fadeIn(animationSpec = tween(1000)),
             exit = fadeOut(animationSpec = tween(1000))
         ) {
@@ -181,9 +175,4 @@ fun LoginScreen(viewModel: GoMathViewModel, navController: NavHostController) {
             )
         }
     }
-}
-
-// Función para manejar el inicio de sesión
-fun handleLogin(context: Context) {
-    Toast.makeText(context, "Iniciant sessió...", Toast.LENGTH_SHORT).show()
 }

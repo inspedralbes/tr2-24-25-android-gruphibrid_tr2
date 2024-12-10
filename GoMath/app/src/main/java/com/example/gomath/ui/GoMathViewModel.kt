@@ -15,6 +15,29 @@ import io.socket.emitter.Emitter
 class GoMathViewModel() : ViewModel() {
     private val loginError = mutableStateOf<String?>(null)
 
+    lateinit var mSocket: Socket
+
+    //Creació de socket
+    init {
+        viewModelScope.launch {
+            try {
+                mSocket = IO.socket("http://10.0.2.2:3010")
+                // mSocket = IO.socket("http://juicengo.dam.inspedralbes.cat:20871")
+            } catch (e: Exception) {
+                e.printStackTrace()
+                Log.e("SocketIO", "Failed to connect to socket", e)
+            }
+            mSocket.connect()
+            mSocket.on(Socket.EVENT_CONNECT) {
+                Log.d("SocketIO", "Connected to socket: ${mSocket.id()}")
+
+            }
+            mSocket.on(Socket.EVENT_DISCONNECT) {
+                Log.d("SocketIO", "Disconnected from socket")
+            }
+        }
+    }
+
     fun login(email: String, password: String) {
         viewModelScope.launch {
             val loginRequest = LoginRequest(email, password)

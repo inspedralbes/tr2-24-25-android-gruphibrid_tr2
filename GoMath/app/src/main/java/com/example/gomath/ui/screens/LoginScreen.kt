@@ -22,6 +22,7 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.gomath.ui.GoMathApp
 import com.example.gomath.ui.GoMathViewModel
 
 @Composable
@@ -132,7 +133,7 @@ fun LoginScreen(viewModel: GoMathViewModel, navController: NavHostController) {
                                 loginSuccess = true
                                 viewModel.login(email, password)
                                 handleLogin(context)
-                                navController.navigate("")
+                                navController.navigate(GoMathApp.Code.name)
                             } else {
                                 showError = true
                             }

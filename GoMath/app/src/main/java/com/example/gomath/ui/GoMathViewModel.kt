@@ -11,9 +11,16 @@ import kotlinx.coroutines.launch
 import io.socket.client.IO
 import io.socket.client.Socket
 import io.socket.emitter.Emitter
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import org.json.JSONObject
 
 class GoMathViewModel() : ViewModel() {
     private val loginError = mutableStateOf<String?>(null)
+
+    private val currentUser = MutableStateFlow(User())
+//    val uiState: StateFlow<User> = currentUser.asStateFlow()
 
     lateinit var mSocket: Socket
 
@@ -49,11 +56,11 @@ class GoMathViewModel() : ViewModel() {
                 Log.d("response", result.toString())
                 val loginResponse = result.getOrNull()
                 if (loginResponse != null) {
-                    val user = User(
+                    currentUser.value = User(
                         loginResponse.email,
                         loginResponse.role
                     )
-                    Log.d("Login", user.toString())
+                    Log.d("Login", currentUser.value.toString())
                 }
                 else {
                     Log.e("Login", "Resposta correcta però el cos és nul o mal format. Comproveu la resposta de l'API.")
@@ -64,5 +71,13 @@ class GoMathViewModel() : ViewModel() {
                 }
             }
         }
+    }
+
+    fun socket(code: String) {
+        val data = JSONObject()
+        data.put("email", currentUser.value.email)
+        data.put("role", currentUser.value.role)
+        data.put("room", code)
+        mSocket.emit("joinRoom", data)
     }
 }

@@ -12,15 +12,12 @@ import io.socket.client.IO
 import io.socket.client.Socket
 import io.socket.emitter.Emitter
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import org.json.JSONObject
 
 class GoMathViewModel() : ViewModel() {
     private val loginError = mutableStateOf<String?>(null)
 
     private val currentUser = MutableStateFlow(User())
-//    val uiState: StateFlow<User> = currentUser.asStateFlow()
 
     lateinit var mSocket: Socket
 
@@ -29,7 +26,7 @@ class GoMathViewModel() : ViewModel() {
         viewModelScope.launch {
             try {
                 mSocket = IO.socket("http://10.0.2.2:3010")
-                // mSocket = IO.socket("http://juicengo.dam.inspedralbes.cat:20871")
+                // mSocket = IO.socket("http://10.0.2.2:8000")
             } catch (e: Exception) {
                 e.printStackTrace()
                 Log.e("SocketIO", "Failed to connect to socket", e)

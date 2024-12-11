@@ -10,6 +10,8 @@ import androidx.navigation.compose.composable
 import com.example.gomath.R
 import com.example.gomath.ui.screens.CodeScreen
 import com.example.gomath.ui.screens.LoginScreen
+import com.example.gomath.ui.screens.MandoScreen
+
 
 enum class GoMathApp(@StringRes val title: Int) {
     Login(title = R.string.login),
@@ -29,9 +31,9 @@ fun GoMathApp(navController: NavHostController, context: Context) {
         composable(route = GoMathApp.Code.name) {
             CodeScreen(viewModel, navController)
         }
-//        composable(route = GoMathApp.Control.name) {
-//            ControlScreen()
-//        }
+        composable(route = GoMathApp.Control.name) {
+           MandoScreen(viewModel, navController)
+        }
 //        composable(route = GoMathApp.Result.name) {
 //            ResultScreen()
 //        }

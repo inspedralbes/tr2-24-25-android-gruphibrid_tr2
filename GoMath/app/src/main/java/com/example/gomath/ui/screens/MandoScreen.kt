@@ -1,178 +1,111 @@
 package com.example.gomath.ui.screens
 
-import android.content.Context
-import android.widget.Toast
-import androidx.compose.animation.*
-import androidx.compose.animation.core.*
+import androidx.compose.animation.animateColor
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material3.*
+import androidx.compose.material.icons.filled.FastRewind
+import androidx.compose.material.icons.filled.PauseCircle
+import androidx.compose.material.icons.filled.FastForward
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.gomath.ui.GoMathApp
 import com.example.gomath.ui.GoMathViewModel
+
+
 
 @Composable
 fun MandoScreen(viewModel: GoMathViewModel, navController: NavHostController) {
-    var email by remember { mutableStateOf("") }
-    var password by remember { mutableStateOf("") }
-    var passwordVisible by remember { mutableStateOf(false) }
-    var showError by remember { mutableStateOf(false) }
-    var loginSuccess by remember { mutableStateOf(false) }
-    val context = LocalContext.current
+    var clickedButton by remember { mutableStateOf<ButtonType?>(null) }
 
-    // Fondo animado
-    val infiniteTransition = rememberInfiniteTransition()
-    val offsetAnimation by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1000f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(6000, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        )
-    )
-
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.primaryContainer,
-                        MaterialTheme.colorScheme.primary
-                    ),
-                    startY = offsetAnimation
-                )
-            ),
-        contentAlignment = Alignment.Center
+            .background(MaterialTheme.colorScheme.primaryContainer)
+            .padding(24.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        AnimatedVisibility(
-            visible = !loginSuccess,
-            enter = fadeIn(animationSpec = tween(1000)) + expandVertically(),
-            exit = fadeOut(animationSpec = tween(800)) + shrinkVertically()
+        ControlButton(
+            text = "Retrocedir",
+            icon = Icons.Filled.FastRewind,
+            isClicked = clickedButton == ButtonType.REWIND
         ) {
-            Card(
-                shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(8.dp),
-                modifier = Modifier
-                    .padding(horizontal = 24.dp)
-                    .fillMaxWidth()
-            ) {
-                Column(
-                    modifier = Modifier.padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "Benvingut/da",
-                        style = MaterialTheme.typography.headlineLarge,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    // Campo de correo electrónico
-                    OutlinedTextField(
-                        value = email,
-                        onValueChange = { email = it },
-                        label = { Text("Correu electrònic") },
-                        placeholder = { Text("exemple@correu.com") },
-                        leadingIcon = {
-                            Icon(Icons.Default.Email, contentDescription = "Email")
-                        },
-                        singleLine = true,
-                        isError = showError && email.isEmpty(),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    // Campo de contraseña
-                    OutlinedTextField(
-                        value = password,
-                        onValueChange = { password = it },
-                        label = { Text("Contrasenya") },
-                        placeholder = { Text("******") },
-                        leadingIcon = {
-                            Icon(Icons.Default.Lock, contentDescription = "Contrasenya")
-                        },
-                        visualTransformation = if (passwordVisible)
-                            VisualTransformation.None else PasswordVisualTransformation(),
-                        trailingIcon = {
-                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                                Icon(
-                                    imageVector = Icons.Default.Lock,
-                                    contentDescription = "Mostra o amaga la contrasenya"
-                                )
-                            }
-                        },
-                        singleLine = true,
-                        isError = showError && password.isEmpty(),
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    Spacer(modifier = Modifier.height(24.dp))
-
-                    // Botón de inicio de sesión
-                    Button(
-                        onClick = {
-
-
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(50.dp)
-                            .animateContentSize(animationSpec = tween(500)),
-                        shape = RoundedCornerShape(8.dp)
-                    ) {
-                        Text(
-                            text = "Inicia Sessió",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = Color.White
-                        )
-                    }
-
-                    // Mensaje de error
-                    AnimatedVisibility(
-                        visible = showError,
-                        enter = fadeIn(animationSpec = tween(500)) + slideInVertically(),
-                        exit = fadeOut(animationSpec = tween(500)) + slideOutVertically()
-                    ) {
-                        Text(
-                            text = "Si us plau, completa tots els camps",
-                            color = MaterialTheme.colorScheme.error,
-                            fontSize = 16.sp,
-                            modifier = Modifier.padding(top = 16.dp)
-                        )
-                    }
-                }
-            }
+            clickedButton = ButtonType.REWIND
+            viewModel.rewind()
         }
 
-        // Animación de éxito
-        AnimatedVisibility(
-            visible = loginSuccess,
-            enter = scaleIn(animationSpec = tween(1000)) + fadeIn(animationSpec = tween(1000)),
-            exit = fadeOut(animationSpec = tween(1000))
+        Spacer(modifier = Modifier.height(16.dp))
+
+        ControlButton(
+            text = "Pausar",
+            icon = Icons.Filled.PauseCircle,
+            isClicked = clickedButton == ButtonType.PAUSE
         ) {
-            Text(
-                text = "Inici de sessió completat! 🎉",
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.onPrimary,
-                modifier = Modifier.padding(16.dp)
-            )
+            clickedButton = ButtonType.PAUSE
+            viewModel.pause()
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        ControlButton(
+            text = "Adelantar",
+            icon = Icons.Filled.FastForward,
+            isClicked = clickedButton == ButtonType.FORWARD
+        ) {
+            clickedButton = ButtonType.FORWARD
+            viewModel.forward()
         }
     }
+}
+
+@Composable
+fun ControlButton(
+    text: String,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    isClicked: Boolean,
+    onClick: () -> Unit
+) {
+    val backgroundColor by animateColorAsState(
+        targetValue = if (isClicked) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary
+    )
+
+    val scale by animateFloatAsState(
+        targetValue = if (isClicked) 1.2f else 1f
+    )
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { onClick() }
+            .background(backgroundColor, MaterialTheme.shapes.medium)
+            .padding(16.dp)
+            .scale(scale),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = text,
+            tint = Color.White,
+            modifier = Modifier.size(24.dp)
+        )
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(text = text, color = Color.White, fontSize = 18.sp)
+    }
+}
+
+enum class ButtonType {
+    REWIND, PAUSE, FORWARD
 }

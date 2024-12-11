@@ -80,4 +80,23 @@ class GoMathViewModel() : ViewModel() {
         data.put("room", code)
         mSocket.emit("joinRoom", data)
     }
+
+    fun rewind() {
+        Log.d("MandoScreen", "Rebobinando...")
+        // Envía una señal al servidor si es necesario
+        mSocket.emit("rewind")
+    }
+
+    fun pause() {
+        Log.d("MandoScreen", "Pausando...")
+        // Envía una señal al servidor si es necesario
+        mSocket.emit("pause")
+    }
+
+    fun forward() {
+        Log.d("MandoScreen", "Avanzando...")
+        // Envía una señal al servidor si es necesario
+        mSocket.emit("forward")
+    }
+
 }

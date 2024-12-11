@@ -48,6 +48,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.gomath.ui.GoMathApp
 import com.example.gomath.ui.GoMathViewModel
 
 @Composable
@@ -130,6 +131,8 @@ fun CodeScreen(viewModel: GoMathViewModel, navController: NavHostController) {
                             showError = false
                             codeSuccess = true
                             viewModel.socket(code)
+                            navController.navigate(GoMathApp.Control.name)
+
                         },
                         modifier = Modifier
                             .fillMaxWidth()

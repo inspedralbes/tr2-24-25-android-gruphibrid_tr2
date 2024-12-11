@@ -60,6 +60,8 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
     implementation("io.coil-kt:coil:2.4.0")
+    implementation("androidx.compose.material:material-icons-extended:<latest-version>")
+
     implementation("androidx.recyclerview:recyclerview:1.0.0")
     implementation("com.google.code.gson:gson:2.8.5")
     implementation("org.json:json:20230227")

@@ -1,7 +1,7 @@
 package com.example.gomath.network
 
 import com.example.gomath.model.LoginRequest
-import com.example.gomath.model.User
+import com.example.gomath.model.LoginResponse
 import retrofit2.http.Path
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -28,5 +28,5 @@ object RetrofitInstance {
 
 interface GoMathApi {
     @POST("api/userLogin") // Canviar direcció
-    suspend fun login(@Body loginRequest: LoginRequest): Response<User>
+    suspend fun login(@Body loginRequest: LoginRequest): Response<LoginResponse>
 }

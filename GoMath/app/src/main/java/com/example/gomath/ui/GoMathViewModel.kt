@@ -6,11 +6,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.gomath.data.loginFromApi
 import com.example.gomath.model.LoginRequest
+import com.example.gomath.model.LoginResponse
 import com.example.gomath.model.User
+import com.example.gomath.model.Users
 import kotlinx.coroutines.launch
 import io.socket.client.IO
 import io.socket.client.Socket
-import io.socket.emitter.Emitter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,7 +20,14 @@ import org.json.JSONObject
 class GoMathViewModel() : ViewModel() {
     private val loginError = mutableStateOf<String?>(null)
 
-    private val currentUser = MutableStateFlow(User())
+    private val currentUser = MutableStateFlow(LoginResponse())
+
+    // Llista de productes
+    private val _users = MutableStateFlow(Users())
+    val users: StateFlow<Users> get() = _users.asStateFlow()
+    // Funció per establir la llista de productes
+
+    private var codeActual: String = "";
 //    val uiState: StateFlow<User> = currentUser.asStateFlow()
 
     lateinit var mSocket: Socket
@@ -56,7 +64,7 @@ class GoMathViewModel() : ViewModel() {
                 Log.d("response", result.toString())
                 val loginResponse = result.getOrNull()
                 if (loginResponse != null) {
-                    currentUser.value = User(
+                    currentUser.value = LoginResponse(
                         loginResponse.email,
                         loginResponse.role
                     )
@@ -78,25 +86,52 @@ class GoMathViewModel() : ViewModel() {
         data.put("email", currentUser.value.email)
         data.put("role", currentUser.value.role)
         data.put("room", code)
+        codeActual = code
         mSocket.emit("joinRoom", data)
     }
 
-    fun rewind() {
-        Log.d("MandoScreen", "Rebobinando...")
-        // Envía una señal al servidor si es necesario
-        mSocket.emit("rewind")
+    fun getLlista() {
+        val data = JSONObject()
+        data.put("room", codeActual) // Enviar el código de la sala al servidor
+
+        // Emitir el evento `getRoomUserDetails` al servidor
+        mSocket.emit("getRoomUserDetails", data)
+
+        // Escuchar la respuesta del servidor
+        mSocket.on("roomUserDetails") { args ->
+            val response = args[0] as JSONObject
+            val usersArray = response.optJSONArray("users")
+            val roomName = response.optString("room")
+            val message = response.optString("message", "No message")
+
+            if (usersArray != null) {
+                // Crear una lista de usuarios basada en los datos recibidos
+                val userList = mutableListOf<User>()
+                for (i in 0 until usersArray.length()) {
+                    val userJson = usersArray.getJSONObject(i)
+                    val user = User(
+                        email = userJson.optString("email", ""),
+                        username = userJson.optString("username", ""),
+                        role = userJson.optString("role", "")
+                    )
+                    userList.add(user)
+                }
+
+                // Actualizar el flujo de usuarios
+                _users.value = Users(users = userList)
+
+                // Mostrar en Log para pruebas
+                Log.d("SocketIO", "Sala: $roomName, Usuaris: ${_users.value.users}")
+            } else {
+                Log.w("SocketIO", "Missatge del servidor: $message")
+            }
+        }
     }
 
     fun pause() {
         Log.d("MandoScreen", "Pausando...")
         // Envía una señal al servidor si es necesario
         mSocket.emit("pause")
-    }
-
-    fun forward() {
-        Log.d("MandoScreen", "Avanzando...")
-        // Envía una señal al servidor si es necesario
-        mSocket.emit("forward")
     }
 
 }

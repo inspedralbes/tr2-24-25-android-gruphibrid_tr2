@@ -1,8 +1,8 @@
 package com.example.gomath.model
 
-data class User (
-    val email: String = "",
-    val role: String = ""
+data class User(
+    val email: String,
+    val role: String
 )
 
 data class LoginRequest (

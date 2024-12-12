@@ -2,6 +2,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("kotlin-kapt")
 }
 
 android {
@@ -64,6 +65,10 @@ dependencies {
     implementation("com.google.code.gson:gson:2.8.5")
     implementation("org.json:json:20230227")
     implementation("io.socket:socket.io-client:2.1.1")
+    implementation("androidx.room:room-ktx:2.6.1")
+    implementation(libs.firebase.firestore.ktx)
+    kapt("androidx.room:room-compiler:2.6.1")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

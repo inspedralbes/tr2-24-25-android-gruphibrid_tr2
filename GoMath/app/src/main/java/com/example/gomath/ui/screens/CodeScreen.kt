@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -45,6 +46,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.gomath.ui.GoMathApp
 import com.example.gomath.ui.GoMathViewModel
 
 @Composable
@@ -54,14 +56,14 @@ fun CodeScreen(viewModel: GoMathViewModel, navController: NavHostController) {
     var codeSuccess by remember { mutableStateOf(false) }
 
     // Fondo animado
-    val infiniteTransition = rememberInfiniteTransition()
+    val infiniteTransition = rememberInfiniteTransition(label = "Animation")
     val offsetAnimation by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = 1000f,
         animationSpec = infiniteRepeatable(
             animation = tween(6000, easing = LinearEasing),
             repeatMode = RepeatMode.Reverse
-        )
+        ), label = "Animation"
     )
 
     Box(
@@ -102,14 +104,14 @@ fun CodeScreen(viewModel: GoMathViewModel, navController: NavHostController) {
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // Campo de correo electrónico
+                    // Campo de código
                     OutlinedTextField(
                         value = code,
                         onValueChange = { code = it },
                         label = { Text("Introdueixi un Codi") },
                         placeholder = { Text("Codi") },
                         leadingIcon = {
-                            Icon(Icons.Default.Email, contentDescription = "Email")
+                            Icon(Icons.Default.Lock, contentDescription = "Codi")
                         },
                         singleLine = true,
                         isError = showError && code.isEmpty(),
@@ -118,12 +120,10 @@ fun CodeScreen(viewModel: GoMathViewModel, navController: NavHostController) {
 
                     Spacer(modifier = Modifier.height(16.dp))
 
-                    Spacer(modifier = Modifier.height(24.dp))
-
                     // Botón de inicio de sesión
                     Button(
                         onClick = {
-                            // Enviar codigo
+                            // Enviar código
                             showError = false
                             codeSuccess = true
                             viewModel.socket(code)
@@ -154,9 +154,28 @@ fun CodeScreen(viewModel: GoMathViewModel, navController: NavHostController) {
                             modifier = Modifier.padding(top = 16.dp)
                         )
                     }
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    // Botón de logout
+                    Button(
+                        onClick = {
+                            viewModel.logout(navController.context)
+                            navController.navigate(GoMathApp.Login.name)
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(8.dp)
+                    ) {
+                        Text(
+                            text = "Cerrar sesión",
+                            style = MaterialTheme.typography.labelLarge,
+                            color = Color.White
+                        )
+                    }
                 }
             }
         }
+
         // Animación de éxito
         AnimatedVisibility(
             visible = codeSuccess,

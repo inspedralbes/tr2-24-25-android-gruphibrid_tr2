@@ -39,15 +39,22 @@ fun MandoScreen(viewModel: GoMathViewModel, navController: NavHostController) {
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.primaryContainer)
             .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Control",
-            fontSize = 40.sp,
-            modifier = Modifier
-                .align(alignment = Alignment.CenterHorizontally)
+            text = "Control de Usuarios",
+            fontSize = 32.sp,
+            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onPrimary,
+            modifier = Modifier.align(Alignment.CenterHorizontally)
         )
-        LlistaRoom(users, viewModel)
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        LlistaRoom(users = users, viewModel = viewModel, modifier = Modifier.weight(1f))
+
+        Spacer(modifier = Modifier.height(16.dp))
+
         ControlButton(
             text = "Pausar",
             icon = Icons.Filled.PauseCircle,
@@ -56,27 +63,26 @@ fun MandoScreen(viewModel: GoMathViewModel, navController: NavHostController) {
             clickedButton = ButtonType.PAUSE
             viewModel.pause()
         }
-
-        Spacer(modifier = Modifier.height(16.dp))
     }
 }
 
 @Composable
-fun LlistaRoom(users: Users, viewModel: GoMathViewModel){
+fun LlistaRoom(users: Users, viewModel: GoMathViewModel, modifier: Modifier = Modifier) {
     viewModel.getLlista()
-    // Utilitzem un LazyColumn per crear una llista vertical
-    LazyColumn(modifier = Modifier.size(550.dp)) {
-        // Iterem per cada dos elements de la llista
-        items(users.users.chunked(2)) { rowUsers ->
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier
-                    .padding(vertical = 8.dp)
-            ) {
-                // Per cada element de la fila (2 per fila)
-                for (user in rowUsers) {
-                    UserIndividual(user = user, users = users, viewModel = viewModel, modifier = Modifier.weight(5f))
-                }
+    Box(modifier = modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp), // Mejor espaciado en la lista
+            verticalArrangement = Arrangement.spacedBy(12.dp) // Espacio mayor entre usuarios
+        ) {
+            items(users.users) { user ->
+                UserIndividual(
+                    user = user,
+                    users = users,
+                    viewModel = viewModel,
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
     }
@@ -85,17 +91,50 @@ fun LlistaRoom(users: Users, viewModel: GoMathViewModel){
 @Composable
 fun UserIndividual(user: User, users: Users, viewModel: GoMathViewModel, modifier: Modifier) {
     Log.d("users", "user:" + user.username)
-    Card (
+
+    // Cambié los colores a un esquema más armónico con gradientes suaves
+    val colors = listOf(
+        Color(0xFF00459A)  // Light Orange
+    )
+    val backgroundColor = colors[user.username.hashCode() % colors.size]
+
+    Card(
+        modifier = Modifier
+            .padding(8.dp) // Se aumentó el espaciado entre las tarjetas
+            .fillMaxWidth()
+            .height(90.dp) // Aumento de altura para mejor presentación
+            .background(backgroundColor, shape = MaterialTheme.shapes.large), // Forma más redondeada
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = 8.dp // Sombras suaves para más profundidad
+        ),
         colors = CardDefaults.cardColors(
-        disabledContainerColor = Color.Red,
-        disabledContentColor = Color.Red,
-        contentColor = Color.Cyan,
-        containerColor = Color.LightGray)
+            containerColor = backgroundColor,
+            contentColor = Color.White
+        ),
+        shape = MaterialTheme.shapes.medium // Bordes redondeados para un diseño más moderno
     ) {
-        Text(text = user.username, color = Color.Black)
-        Text(text = "Hola", color = Color.Black)
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(12.dp), // Padding interno más amplio
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = user.username,
+                style = MaterialTheme.typography.titleLarge, // Usando titleLarge como alternativa
+                color = Color.White
+            )
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(
+                text = "¡Hola!",
+                style = MaterialTheme.typography.bodyMedium, // Usando bodyMedium como alternativa
+                color = Color.White.copy(alpha = 0.7f) // Menor opacidad para el saludo
+            )
+        }
     }
 }
+
 
 @Composable
 fun ControlButton(
@@ -116,8 +155,8 @@ fun ControlButton(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() }
-            .background(backgroundColor, MaterialTheme.shapes.medium)
-            .padding(16.dp)
+            .background(backgroundColor, shape = MaterialTheme.shapes.medium)
+            .padding(20.dp) // Espaciado más amplio en el botón
             .scale(scale),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
@@ -126,10 +165,15 @@ fun ControlButton(
             imageVector = icon,
             contentDescription = text,
             tint = Color.White,
-            modifier = Modifier.size(24.dp)
+            modifier = Modifier.size(28.dp) // Icono más grande para mejor visibilidad
         )
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(text = text, color = Color.White, fontSize = 18.sp)
+        Spacer(modifier = Modifier.width(12.dp))
+        Text(
+            text = text,
+            color = Color.White,
+            fontSize = 20.sp, // Mayor tamaño de texto
+            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+        )
     }
 }
 

@@ -100,6 +100,7 @@ class GoMathViewModel() : ViewModel() {
         // Escuchar la respuesta del servidor
         mSocket.on("roomUserDetails") { args ->
             val response = args[0] as JSONObject
+            Log.d("response", response.toString())
             val usersArray = response.optJSONArray("users")
             val roomName = response.optString("room")
             val message = response.optString("message", "No message")

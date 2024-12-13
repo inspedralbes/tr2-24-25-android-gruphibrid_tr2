@@ -3,7 +3,9 @@ package com.example.gomath.model
 data class User (
     val email: String = "",
     val username: String = "",
-    val role: String = ""
+    val role: String = "",
+    val points: Int = 0,
+    val questions: Int = 0
 )
 
 data class Users(

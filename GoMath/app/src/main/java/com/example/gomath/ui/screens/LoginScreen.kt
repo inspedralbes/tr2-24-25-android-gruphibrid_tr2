@@ -131,7 +131,7 @@ fun LoginScreen(viewModel: GoMathViewModel, navController: NavHostController) {
                             if (email.isNotEmpty() && password.isNotEmpty()) {
                                 showError = false
                                 loginSuccess = true
-                                viewModel.login(email, password)
+                                viewModel.login(email, password, context)
                                 handleLogin(context)
                                 navController.navigate(GoMathApp.Code.name)
                             } else {

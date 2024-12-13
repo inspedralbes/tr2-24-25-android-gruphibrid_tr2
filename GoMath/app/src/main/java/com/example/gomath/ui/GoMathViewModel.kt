@@ -27,6 +27,14 @@ class GoMathViewModel() : ViewModel() {
     private val _currentUser = MutableStateFlow<UserSession?>(null)
     // val currentUser: StateFlow<UserSession?> = _currentUser
 
+    // Llista de productes
+    private val _users = MutableStateFlow(Users())
+    val users: StateFlow<Users> get() = _users.asStateFlow()
+    // Funció per establir la llista de productes
+
+    private var codeActual: String = "";
+//    val uiState: StateFlow<User> = currentUser.asStateFlow()
+
     private lateinit var mSocket: Socket
 
     //Creació de socket

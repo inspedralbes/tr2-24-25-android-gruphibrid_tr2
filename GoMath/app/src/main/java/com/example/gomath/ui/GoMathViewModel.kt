@@ -165,6 +165,18 @@ class GoMathViewModel() : ViewModel() {
         }
     }
 
+    fun kickUserFromRoom(user: User) {
+        Log.d("kick", user.toString())
+        val data = JSONObject()
+        data.put("targetEmail", user.email)
+        data.put("room", codeActual) // Enviar el código de la sala al servidor
+        mSocket.emit("kickUser", data)
+        Log.d("kick", "Emitiendo kickUser: $data")
+        getLlista()
+        // Mostrar en Log para pruebas
+        Log.d("kick", "L'Usuari: ${user.username} Ha estat eliminat")
+    }
+
     fun pause() {
         Log.d("MandoScreen", "Pausando...")
         // Envía una señal al servidor si es necesario

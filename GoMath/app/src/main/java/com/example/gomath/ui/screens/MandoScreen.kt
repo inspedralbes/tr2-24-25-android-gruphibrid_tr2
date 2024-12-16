@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.PauseCircle
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
@@ -89,7 +91,7 @@ fun LlistaRoom(users: Users, viewModel: GoMathViewModel, modifier: Modifier = Mo
 }
 
 @Composable
-fun UserIndividual(user: User, users: Users, viewModel: GoMathViewModel, modifier: Modifier) {
+fun UserIndividual(user: User, users: Users, viewModel: GoMathViewModel, modifier: Modifier = Modifier) {
     Log.d("users", "user:" + user.username)
 
     // Cambié los colores a un esquema más armónico con gradientes suaves
@@ -98,42 +100,64 @@ fun UserIndividual(user: User, users: Users, viewModel: GoMathViewModel, modifie
     )
     val backgroundColor = colors[user.username.hashCode() % colors.size]
 
-    Card(
+    Box(
         modifier = Modifier
             .padding(8.dp) // Se aumentó el espaciado entre las tarjetas
             .fillMaxWidth()
-            .height(90.dp) // Aumento de altura para mejor presentación
-            .background(backgroundColor, shape = MaterialTheme.shapes.large), // Forma más redondeada
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = 8.dp // Sombras suaves para más profundidad
-        ),
-        colors = CardDefaults.cardColors(
-            containerColor = backgroundColor,
-            contentColor = Color.White
-        ),
-        shape = MaterialTheme.shapes.medium // Bordes redondeados para un diseño más moderno
+            .height(90.dp)
     ) {
-        Column(
+        Card(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(12.dp), // Padding interno más amplio
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
+                .background(backgroundColor, shape = MaterialTheme.shapes.large), // Forma más redondeada
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 8.dp // Sombras suaves para más profundidad
+            ),
+            colors = CardDefaults.cardColors(
+                containerColor = backgroundColor,
+                contentColor = Color.White
+            ),
+            shape = MaterialTheme.shapes.medium // Bordes redondeados para un diseño más moderno
         ) {
-            Text(
-                text = user.username,
-                style = MaterialTheme.typography.titleLarge, // Usando titleLarge como alternativa
-                color = Color.White
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = "¡Hola!",
-                style = MaterialTheme.typography.bodyMedium, // Usando bodyMedium como alternativa
-                color = Color.White.copy(alpha = 0.7f) // Menor opacidad para el saludo
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(12.dp), // Padding interno más amplio
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Text(
+                    text = user.username,
+                    style = MaterialTheme.typography.titleLarge, // Usando titleLarge como alternativa
+                    color = Color.White
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "¡Hola!",
+                    style = MaterialTheme.typography.bodyMedium, // Usando bodyMedium como alternativa
+                    color = Color.White.copy(alpha = 0.7f) // Menor opacidad para el saludo
+                )
+            }
+        }
+
+        // Botón para expulsar al usuario
+        IconButton(
+            onClick = {
+                viewModel.kickUserFromRoom(user)
+            },
+            modifier = Modifier
+                .align(Alignment.TopEnd) // Alinear en la esquina superior derecha
+                .padding(8.dp) // Separación del borde
+        ) {
+            Icon(
+                imageVector = Icons.Default.Close,
+                contentDescription = "Expulsar usuario",
+                tint = Color.Red // Color rojo para indicar acción de expulsión
             )
         }
     }
 }
+
 
 
 @Composable

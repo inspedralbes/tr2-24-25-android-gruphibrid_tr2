@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.PauseCircle
 import androidx.compose.material3.Card
@@ -27,6 +28,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.gomath.model.User
 import com.example.gomath.model.Users
+import com.example.gomath.ui.GoMathApp
 import com.example.gomath.ui.GoMathViewModel
 
 
@@ -43,13 +45,28 @@ fun MandoScreen(viewModel: GoMathViewModel, navController: NavHostController) {
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = "Control de Usuarios",
-            fontSize = 32.sp,
-            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onPrimary,
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
+        Row(modifier = Modifier.align(Alignment.CenterHorizontally)) {
+            // Botón para expulsar al usuario
+            IconButton(
+                onClick = {
+                    viewModel.resetCode()
+                    navController.navigate(GoMathApp.Code.name)
+                }
+            ) {
+                Icon(
+                    imageVector = Icons.Default.ArrowBack,
+                    contentDescription = "Sortir de la Sala",
+                    tint = Color.Blue // Color rojo para indicar acción de expulsión
+                )
+            }
+            Text(
+                text = "Control de Usuarios",
+                fontSize = 32.sp,
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onPrimary,
+                modifier = Modifier
+            )
+        }
 
         Spacer(modifier = Modifier.height(16.dp))
 

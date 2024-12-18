@@ -38,7 +38,7 @@ class GoMathViewModel() : ViewModel() {
     init {
         viewModelScope.launch {
             try {
-                mSocket = IO.socket("http://10.0.2.2:3011")
+                mSocket = IO.socket("http://10.0.2.2:3010")
                 // mSocket = IO.socket("http://10.0.2.2:8000")
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -171,6 +171,10 @@ class GoMathViewModel() : ViewModel() {
             currentState.copy(users = currentState.users.filter { it.email != user.email })
         }
         Log.d("kick", "L'Usuari: ${user.username} Ha estat eliminat")
+    }
+
+    fun resetCode(){
+        codeActual = ""
     }
 
     fun pause() {

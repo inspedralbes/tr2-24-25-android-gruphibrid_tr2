@@ -11,4 +11,6 @@
     <string name="password">Contraseña</string>
     <string name="error_fields">Por favor completa todos los campos.</string>
     <string name="logging_in">Iniciando sesión...</string>
+    <string name="stop">Pausa</string>
+    <string name="user_control">Control de Usuarios</string>
 </resources>

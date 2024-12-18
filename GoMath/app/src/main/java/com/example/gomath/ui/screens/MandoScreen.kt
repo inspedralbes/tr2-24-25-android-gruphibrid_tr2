@@ -22,14 +22,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.gomath.R
 import com.example.gomath.model.User
 import com.example.gomath.model.Users
 import com.example.gomath.ui.GoMathViewModel
-
-
 
 @Composable
 fun MandoScreen(viewModel: GoMathViewModel, navController: NavHostController) {
@@ -44,7 +44,7 @@ fun MandoScreen(viewModel: GoMathViewModel, navController: NavHostController) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Control de Usuarios",
+            text = stringResource(R.string.user_control),
             fontSize = 32.sp,
             fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
             color = MaterialTheme.colorScheme.onPrimary,
@@ -58,7 +58,7 @@ fun MandoScreen(viewModel: GoMathViewModel, navController: NavHostController) {
         Spacer(modifier = Modifier.height(16.dp))
 
         ControlButton(
-            text = "Pausar",
+            text = stringResource(R.string.stop),
             icon = Icons.Filled.PauseCircle,
             isClicked = clickedButton == ButtonType.PAUSE
         ) {
@@ -92,8 +92,6 @@ fun LlistaRoom(users: Users, viewModel: GoMathViewModel, modifier: Modifier = Mo
 
 @Composable
 fun UserIndividual(user: User, users: Users, viewModel: GoMathViewModel, modifier: Modifier = Modifier) {
-    Log.d("users", "user:" + user.username)
-
     // Cambié los colores a un esquema más armónico con gradientes suaves
     val colors = listOf(
         Color(0xFF00459A)  // Light Orange

@@ -9,7 +9,6 @@ import com.example.gomath.data.local.GoMathDB
 import com.example.gomath.data.loginFromApi
 import com.example.gomath.model.LoginRequest
 import com.example.gomath.model.UserSession
-import com.example.gomath.model.LoginResponse
 import com.example.gomath.model.User
 import com.example.gomath.model.Users
 import kotlinx.coroutines.launch
@@ -19,21 +18,19 @@ import io.socket.emitter.Emitter
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import org.json.JSONObject
 
 class GoMathViewModel() : ViewModel() {
     private val loginError = mutableStateOf<String?>(null)
 
     private val _currentUser = MutableStateFlow<UserSession?>(null)
-    // val currentUser: StateFlow<UserSession?> = _currentUser
 
     // Llista de productes
     private val _users = MutableStateFlow(Users())
-    val users: StateFlow<Users> get() = _users.asStateFlow()
-    // Funció per establir la llista de productes
+    val users: StateFlow<Users> = _users.asStateFlow()
 
     private var codeActual: String = "";
-//    val uiState: StateFlow<User> = currentUser.asStateFlow()
 
     private lateinit var mSocket: Socket
 
@@ -41,7 +38,7 @@ class GoMathViewModel() : ViewModel() {
     init {
         viewModelScope.launch {
             try {
-                mSocket = IO.socket("http://10.0.2.2:3010")
+                mSocket = IO.socket("http://10.0.2.2:3011")
                 // mSocket = IO.socket("http://10.0.2.2:8000")
             } catch (e: Exception) {
                 e.printStackTrace()
@@ -50,7 +47,9 @@ class GoMathViewModel() : ViewModel() {
             mSocket.connect()
             mSocket.on(Socket.EVENT_CONNECT) {
                 Log.d("SocketIO", "Connected to socket: ${mSocket.id()}")
-
+                mSocket.on("userJoined", onUserJoined)
+                mSocket.on("userLeft", onUserLeft)
+                //mSocket.on("roomUserDetails", onRoomUsers)
             }
             mSocket.on(Socket.EVENT_DISCONNECT) {
                 Log.d("SocketIO", "Disconnected from socket")
@@ -58,10 +57,50 @@ class GoMathViewModel() : ViewModel() {
         }
     }
 
+    private val onUserJoined = Emitter.Listener { args ->
+        val response = args[0] as JSONObject
+        val username = response.optString("username", "Desconocido")
+        val roomName = response.optString("room", "")
+        val usersArray = response.optJSONArray("users")
+        Log.d("SocketIO", "Usuario $username se unió a la sala $roomName")
+
+        if (usersArray != null) {
+            val userList = mutableListOf<User>()
+            for (i in 0 until usersArray.length()) {
+                val userJson = usersArray.getJSONObject(i)
+                val user = User(
+                    email = userJson.optString("email", ""),
+                    username = userJson.optString("username", ""),
+                    role = userJson.optString("role", "")
+                )
+                userList.add(user)
+            }
+            _users.update { currentState ->
+                currentState.copy(users = userList)
+            }
+            Log.d("SocketIO", "Usuarios actualizados tras unirse: ${_users.value.users}")
+        } else {
+            Log.w("SocketIO", "Lista de usuarios no proporcionada en el evento userJoined.")
+        }
+    }
+
+    private val onUserLeft = Emitter.Listener { args->
+        val response = args[0] as JSONObject
+        val username = response.optString("username", "Desconocido")
+        val email = response.optString("email", "")
+        val roomName = response.optString("room", "")
+        Log.d("SocketIO", "Usuario $username salió de la sala $roomName")
+
+        _users.update { currentState ->
+            currentState.copy(users = currentState.users.filter { it.email != email })
+        }
+    }
+
     fun getUserFromLocal(context: Context, onResult: (UserSession?) -> Unit) {
         viewModelScope.launch {
             val db = GoMathDB.getDatabase(context)
             val userSession = db.GoMathDao().getUser()
+            _currentUser.value = userSession
             onResult(userSession)
         }
     }
@@ -105,14 +144,9 @@ class GoMathViewModel() : ViewModel() {
 
     fun logout(context: Context) {
         viewModelScope.launch {
-            // Borrar los datos del usuario en la base de datos
             val db = GoMathDB.getDatabase(context)
             db.GoMathDao().deleteUser()
-
-            // Restablecer el estado de currentUser
             _currentUser.value = null
-
-            // Aquí también podrías hacer otras acciones necesarias como desconectar el socket si lo deseas
             mSocket.disconnect()
         }
     }
@@ -123,57 +157,19 @@ class GoMathViewModel() : ViewModel() {
         data.put("role", _currentUser.value?.role)
         data.put("room", code)
         codeActual = code
+        Log.d("socket", data.toString())
         mSocket.emit("joinRoom", data)
     }
 
-    fun getLlista() {
-        val data = JSONObject()
-        data.put("room", codeActual) // Enviar el código de la sala al servidor
-
-        // Emitir el evento `getRoomUserDetails` al servidor
-        mSocket.emit("getRoomUserDetails", data)
-
-        // Escuchar la respuesta del servidor
-        mSocket.on("roomUserDetails") { args ->
-            val response = args[0] as JSONObject
-            Log.d("response", response.toString())
-            val usersArray = response.optJSONArray("users")
-            val roomName = response.optString("room")
-            val message = response.optString("message", "No message")
-
-            if (usersArray != null) {
-                // Crear una lista de usuarios basada en los datos recibidos
-                val userList = mutableListOf<User>()
-                for (i in 0 until usersArray.length()) {
-                    val userJson = usersArray.getJSONObject(i)
-                    val user = User(
-                        email = userJson.optString("email", ""),
-                        username = userJson.optString("username", ""),
-                        role = userJson.optString("role", "")
-                    )
-                    userList.add(user)
-                }
-
-                // Actualizar el flujo de usuarios
-                _users.value = Users(users = userList)
-
-                // Mostrar en Log para pruebas
-                Log.d("SocketIO", "Sala: $roomName, Usuaris: ${_users.value.users}")
-            } else {
-                Log.w("SocketIO", "Missatge del servidor: $message")
-            }
-        }
-    }
-
     fun kickUserFromRoom(user: User) {
-        Log.d("kick", user.toString())
         val data = JSONObject()
         data.put("targetEmail", user.email)
-        data.put("room", codeActual) // Enviar el código de la sala al servidor
+        data.put("room", codeActual)
         mSocket.emit("kickUser", data)
         Log.d("kick", "Emitiendo kickUser: $data")
-        getLlista()
-        // Mostrar en Log para pruebas
+        _users.update { currentState ->
+            currentState.copy(users = currentState.users.filter { it.email != user.email })
+        }
         Log.d("kick", "L'Usuari: ${user.username} Ha estat eliminat")
     }
 
@@ -182,5 +178,4 @@ class GoMathViewModel() : ViewModel() {
         // Envía una señal al servidor si es necesario
         mSocket.emit("pause")
     }
-
 }

@@ -70,7 +70,6 @@ fun MandoScreen(viewModel: GoMathViewModel, navController: NavHostController) {
 
 @Composable
 fun LlistaRoom(users: Users, viewModel: GoMathViewModel, modifier: Modifier = Modifier) {
-    viewModel.getLlista()
     Box(modifier = modifier.fillMaxSize()) {
         LazyColumn(
             modifier = Modifier
